@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MediaItem } from '@/types/media';
 import { Play, Music, Video } from 'lucide-react-native';
 
@@ -17,23 +17,21 @@ export default function MediaList({ mediaItems, onItemPress }: MediaListProps) {
 
   const renderMediaItem = ({ item }: { item: MediaItem }) => (
     <TouchableOpacity
-      className="bg-dark-800 rounded-xl p-4 m-2 flex-1 shadow-lg"
-      style={{ minWidth: '45%', maxWidth: '48%' }}
+      style={styles.mediaItem}
       onPress={() => onItemPress(item)}
       activeOpacity={0.8}
     >
-      <View className="relative mb-3">
+      <View style={styles.imageContainer}>
         <Image
           source={{ uri: item.thumbnail }}
-          className="w-full h-32 rounded-lg"
-          style={{ backgroundColor: '#334155' }}
+          style={styles.thumbnail}
         />
-        <View className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
-          <View className="bg-primary/80 rounded-full p-3">
+        <View style={styles.overlay}>
+          <View style={styles.playButton}>
             <Play size={24} color="white" fill="white" />
           </View>
         </View>
-        <View className="absolute top-2 right-2 bg-black/60 rounded-full p-1">
+        <View style={styles.typeIcon}>
           {item.type === 'video' ? (
             <Video size={16} color="white" />
           ) : (
@@ -42,25 +40,25 @@ export default function MediaList({ mediaItems, onItemPress }: MediaListProps) {
         </View>
       </View>
       
-      <Text className="text-white text-lg font-semibold mb-1" numberOfLines={1}>
+      <Text style={styles.title} numberOfLines={1}>
         {item.title}
       </Text>
       {item.artist && (
-        <Text className="text-dark-400 text-sm mb-2" numberOfLines={1}>
+        <Text style={styles.artist} numberOfLines={1}>
           {item.artist}
         </Text>
       )}
-      <Text className="text-dark-500 text-xs">
+      <Text style={styles.duration}>
         {formatDuration(item.duration)}
       </Text>
     </TouchableOpacity>
   );
 
   return (
-    <View className="flex-1 bg-dark-900">
-      <View className="px-4 py-6">
-        <Text className="text-white text-3xl font-bold mb-2">My Media</Text>
-        <Text className="text-dark-400 text-base">
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>My Media</Text>
+        <Text style={styles.headerSubtitle}>
           {mediaItems.length} items available
         </Text>
       </View>
@@ -76,3 +74,82 @@ export default function MediaList({ mediaItems, onItemPress }: MediaListProps) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0f172a',
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingVertical: 24,
+  },
+  headerTitle: {
+    color: 'white',
+    fontSize: 30,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  headerSubtitle: {
+    color: '#94a3b8',
+    fontSize: 16,
+  },
+  mediaItem: {
+    backgroundColor: '#1e293b',
+    borderRadius: 12,
+    padding: 16,
+    margin: 8,
+    flex: 1,
+    minWidth: '45%',
+    maxWidth: '48%',
+  },
+  imageContainer: {
+    position: 'relative',
+    marginBottom: 12,
+  },
+  thumbnail: {
+    width: '100%',
+    height: 128,
+    borderRadius: 8,
+    backgroundColor: '#334155',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playButton: {
+    backgroundColor: 'rgba(99, 102, 241, 0.8)',
+    borderRadius: 50,
+    padding: 12,
+  },
+  typeIcon: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 50,
+    padding: 4,
+  },
+  title: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  artist: {
+    color: '#94a3b8',
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  duration: {
+    color: '#64748b',
+    fontSize: 12,
+  },
+});

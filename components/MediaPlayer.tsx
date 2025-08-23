@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
-import Slider from 'react-native-slider';
 import { MediaItem, PlayerState } from '@/types/media';
 import { 
   Play, 
@@ -36,11 +35,13 @@ export default function MediaPlayer({ mediaItem, onBack }: MediaPlayerProps) {
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (playerState.isPlaying) {
       interval = setInterval(updateProgress, 100);
     }
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [playerState.isPlaying]);
 
   const updateProgress = async () => {
@@ -144,11 +145,13 @@ export default function MediaPlayer({ mediaItem, onBack }: MediaPlayerProps) {
           isLooping={playerState.isLooping}
           volume={isMuted ? 0 : playerState.volume}
           onLoad={(status) => {
-            setPlayerState(prev => ({
-              ...prev,
-              duration: status.durationMillis || 0,
-              isLoading: false,
-            }));
+            if (status.isLoaded) {
+              setPlayerState(prev => ({
+                ...prev,
+                duration: status.durationMillis || 0,
+                isLoading: false,
+              }));
+            }
           }}
           onPlaybackStatusUpdate={(status) => {
             if (status.isLoaded) {
@@ -182,20 +185,16 @@ export default function MediaPlayer({ mediaItem, onBack }: MediaPlayerProps) {
       <View className="flex-1 px-6 py-8">
         {/* Progress Bar */}
         <View className="mb-6">
-          <Slider
-            value={playerState.position}
-            minimumValue={0}
-            maximumValue={playerState.duration}
-            onValueChange={handleSeek}
-            minimumTrackTintColor="#6366f1"
-            maximumTrackTintColor="#334155"
-            thumbStyle={{
-              backgroundColor: '#6366f1',
-              width: 20,
-              height: 20,
-            }}
-            trackStyle={{ height: 4, borderRadius: 2 }}
-          />
+          <View className="flex-row items-center">
+            <View className="flex-1 h-1 bg-dark-700 rounded-full">
+              <View 
+                className="h-1 bg-primary rounded-full"
+                style={{ 
+                  width: `${playerState.duration > 0 ? (playerState.position / playerState.duration) * 100 : 0}%` 
+                }}
+              />
+            </View>
+          </View>
           <View className="flex-row justify-between mt-2">
             <Text className="text-dark-400 text-sm">
               {formatTime(playerState.position)}
@@ -252,20 +251,16 @@ export default function MediaPlayer({ mediaItem, onBack }: MediaPlayerProps) {
             )}
           </TouchableOpacity>
           <View className="flex-1">
-            <Slider
-              value={isMuted ? 0 : playerState.volume}
-              minimumValue={0}
-              maximumValue={1}
-              onValueChange={handleVolumeChange}
-              minimumTrackTintColor="#6366f1"
-              maximumTrackTintColor="#334155"
-              thumbStyle={{
-                backgroundColor: '#6366f1',
-                width: 16,
-                height: 16,
-              }}
-              trackStyle={{ height: 3, borderRadius: 1.5 }}
-            />
+            <View className="flex-row items-center">
+              <View className="flex-1 h-1 bg-dark-700 rounded-full">
+                <View 
+                  className="h-1 bg-primary rounded-full"
+                  style={{ 
+                    width: `${(isMuted ? 0 : playerState.volume) * 100}%` 
+                  }}
+                />
+              </View>
+            </View>
           </View>
         </View>
       </View>

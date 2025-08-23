@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { sampleMediaItems } from '@/data/sampleMedia';
 import { MediaItem } from '@/types/media';
 import { Play, Music, Video, Plus } from 'lucide-react-native';
@@ -23,11 +23,11 @@ export default function PlaylistScreen() {
 
   const renderPlaylistItem = ({ item, index }: { item: MediaItem; index: number }) => (
     <TouchableOpacity
-      className="bg-dark-800 rounded-xl p-4 mb-3 flex-row items-center"
+      style={styles.playlistItem}
       onPress={() => handlePlayItem(item)}
       activeOpacity={0.8}
     >
-      <View className="bg-primary/20 rounded-full p-3 mr-4">
+      <View style={styles.iconContainer}>
         {item.type === 'video' ? (
           <Video size={20} color="#6366f1" />
         ) : (
@@ -35,24 +35,24 @@ export default function PlaylistScreen() {
         )}
       </View>
       
-      <View className="flex-1">
-        <Text className="text-white text-lg font-semibold mb-1">
+      <View style={styles.itemContent}>
+        <Text style={styles.itemTitle}>
           {item.title}
         </Text>
         {item.artist && (
-          <Text className="text-dark-400 text-sm">
+          <Text style={styles.itemArtist}>
             {item.artist}
           </Text>
         )}
       </View>
       
-      <View className="items-end">
-        <Text className="text-dark-500 text-sm mb-1">
+      <View style={styles.itemActions}>
+        <Text style={styles.duration}>
           {formatDuration(item.duration)}
         </Text>
         <TouchableOpacity
           onPress={() => handlePlayItem(item)}
-          className="bg-primary rounded-full p-2"
+          style={styles.playButtonSmall}
         >
           <Play size={16} color="white" fill="white" />
         </TouchableOpacity>
@@ -61,10 +61,10 @@ export default function PlaylistScreen() {
   );
 
   return (
-    <View className="flex-1 bg-dark-900">
-      <View className="px-4 py-6">
-        <Text className="text-white text-3xl font-bold mb-2">My Playlist</Text>
-        <Text className="text-dark-400 text-base">
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>My Playlist</Text>
+        <Text style={styles.headerSubtitle}>
           {playlist.length} songs in queue
         </Text>
       </View>
@@ -77,9 +77,86 @@ export default function PlaylistScreen() {
         showsVerticalScrollIndicator={false}
       />
 
-      <TouchableOpacity className="absolute bottom-6 right-6 bg-primary rounded-full p-4 shadow-lg">
+      <TouchableOpacity style={styles.addButton}>
         <Plus size={24} color="white" />
       </TouchableOpacity>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0f172a',
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingVertical: 24,
+  },
+  headerTitle: {
+    color: 'white',
+    fontSize: 30,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  headerSubtitle: {
+    color: '#94a3b8',
+    fontSize: 16,
+  },
+  playlistItem: {
+    backgroundColor: '#1e293b',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+    borderRadius: 50,
+    padding: 12,
+    marginRight: 16,
+  },
+  itemContent: {
+    flex: 1,
+  },
+  itemTitle: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  itemArtist: {
+    color: '#94a3b8',
+    fontSize: 14,
+  },
+  itemActions: {
+    alignItems: 'flex-end',
+  },
+  duration: {
+    color: '#64748b',
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  playButtonSmall: {
+    backgroundColor: '#6366f1',
+    borderRadius: 50,
+    padding: 8,
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    backgroundColor: '#6366f1',
+    borderRadius: 50,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+});
